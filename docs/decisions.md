@@ -238,3 +238,29 @@ stays out until its docs page is read. Phase 4 must still check every template
 entry's parameters against its docs page, because many use generic defaults
 (D-006) and some are invalid (e.g. Hailuo's default duration 5; the CLI allows
 only 6 or 10).
+
+## D-020: We add a site header, against the template's "no app header" rule (DISAGREEMENT, resolved)
+
+The template says "Dark theme only. No app header" (`AGENTS.md`). The brief
+says to add the higgsfield.ai top navigation and that the site's layout is
+the source of truth for page structure (§2, §9). The brief wins: a
+`SiteHeader` with Explore · Image · Video · Audio · Effects · Community ·
+Pricing, credit pill, Upgrade and account menu. The template's other rules
+still hold inside each page (one feed, one dock state, dark only, lime only for
+the Generate CTA and active states). One addition: the lime **Upgrade** button
+the brief asks for is the only other lime control.
+
+## D-021: The generator uses a left control panel built from `PromptBox` parts
+
+The brief's generator (copied from higgsfield.ai `/ai/video`) has a ~380px
+left panel and a right canvas. The template's Studio uses a horizontal dock.
+We keep the template's components and the single controlled dock state, but
+compose `PromptBox.*` parts (and extend them backward-compatibly where needed)
+into a vertical panel, instead of hand-rolling a second UI system. The final
+spacing waits on the live-site capture (D-001).
+
+## D-022: Display typeface (OPEN until the live site is captured)
+
+The template loads Space Grotesk / Inter / IBM Plex Mono. The brief describes
+"bold condensed uppercase display headings". Space Grotesk isn't condensed.
+Keep the template fonts until screenshots show what the site uses, then decide.
