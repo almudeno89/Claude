@@ -225,3 +225,16 @@ with `credentials: "omit"` and rejects tickets whose headers include
 behavior. Because reference uploads may be tagged temporary, the `uploads`
 library tab should copy reference files to R2 too if we want them reusable
 after Higgsfield's retention window. Decide in Phase 3.
+
+## D-019: Which models appear in the picker (DISAGREEMENT, resolved)
+
+The brief (§0 rule 2) says unverified models stay out of the picker. The
+template (`AGENTS.md`) says to keep every installed model visible even when its
+live behavior is unverified. The brief also calls template REST paths
+"verified from its source" (§4). Resolution: the 38 template entries
+(**Path verified**) stay in the picker; anything without a REST path from the
+template or the live docs (**Unverified**: Veo, Nano Banana, GPT Image, audio…)
+stays out until its docs page is read. Phase 4 must still check every template
+entry's parameters against its docs page, because many use generic defaults
+(D-006) and some are invalid (e.g. Hailuo's default duration 5; the CLI allows
+only 6 or 10).
