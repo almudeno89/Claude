@@ -1,0 +1,18 @@
+# Reference clones of Higgsfield repos (read-only source material, never committed)
+/_reference/
+
+# Dependencies and build output
+node_modules/
+.next/
+out/
+build/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# Env and local state
+.env
+.env*.local
+.vercel
+.DS_Store
+*.log
