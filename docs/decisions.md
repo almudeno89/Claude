@@ -142,3 +142,86 @@ tests here we need a local `mongod` started as a single-node replica set
 are blocked, but Docker is installed and Docker Hub answers. Default: run the
 official `mongo` image with `--replSet rs0` for dev and integration tests.
 Confirm in Phase 1.
+
+## D-013: Call the REST API with our own thin `fetch` client, not `@higgsfield/client` v2
+
+Choice recorded per brief §1a. Reasons, from the SDK source at `e3f2742`:
+
+- v2 has **no cancel method and no generation upload method**
+  (`higgsfield-js/src/v2/types.ts:91`, only `cancel_url` is exposed). We need both.
+- v2 polling treats only `completed | nsfw | failed` as terminal
+  (`src/v2/client.ts:206-210`); `canceled` is missing from its status type
+  (`src/v2/types.ts:77`), so a canceled run is polled until timeout.
+- v2 wraps the **billable submit POST** in retries with no idempotency key, and
+  because its response interceptor converts HTTP errors to `APIError` before the
+  retry check, it effectively retries 4xx as well (`src/utils/retry.ts:27-37`,
+  `src/v2/client.ts:166-178`). That risks duplicate paid jobs.
+
+The template's client (`generation/platform.ts`) already does submit / status /
+cancel / upload-URL with the right shapes. We port it to `lib/higgsfield/`
+(server-only), drop body logging (D-008), and add our own retry policy (D-015).
+
+## D-014: Credentials are one `key_id:key_secret` string in `HF_CREDENTIALS`
+
+Both SDKs send `Authorization: Key <key_id>:<key_secret>`
+(`higgsfield-js/src/v2/client.ts:119`, `higgsfield_client/http/client.py:179`).
+The JS SDK reads `HF_CREDENTIALS` (then `HF_KEY`, then
+`HF_API_KEY`+`HF_API_SECRET`, `src/auth.ts:10-23`). The template treats the key
+as one opaque string and sends `Key <string>`, which is the same header when the
+string is `id:secret`. We keep `HF_CREDENTIALS=key_id:key_secret` (brief §11)
+and validate at boot that it has exactly one `:` and only printable ASCII.
+The credentials dashboard is named as `cloud.higgsfield.ai` in the Python SDK
+README, `open.higgsfield.ai` in the template, `console.higgsfield.ai` in the
+brief (see D-003).
+
+## D-015: Submit retry policy (our own; SDKs disagree)
+
+- The SDKs disagree (JS: ~all HTTP errors, 4 attempts, jitter; PY: 408/429/5xx,
+  3 attempts, no jitter). Neither sends an idempotency key, and the docs could
+  not be checked for one (D-001).
+- Ours: retry the submit POST **only** on network errors that happened before
+  any response, and on **429** (honouring `Retry-After` if present), with
+  exponential backoff plus full jitter, at most 3 attempts. **Do not
+  auto-retry 5xx or timeouts on submit**: the request may have been accepted, so
+  the generation stays `pending_submit` and the reconciler resolves it (brief §7
+  step 4). Status/cancel GETs are idempotent and are retried on 429/5xx.
+- If the live docs describe an idempotency header, add it and widen retries.
+
+## D-016: Webhook authenticity: our own HMAC token; never trust the body
+
+Neither SDK has webhook signature code. JS v2 accepts `webhook.secret` and
+discards it; a JS helper comment mentions an `X-Webhook-Secret-Key` header that
+no code sends (`src/helpers.ts:177`). So, as the brief says: the webhook URL
+carries `gid` + `t=HMAC_SHA256(gid, HF_WEBHOOK_SECRET)` (constant-time compare),
+and the handler re-fetches `GET /requests/{id}/status` before acting. If a
+signature or secret header is documented later, verify it too. The attach
+format is `?hf_webhook=<encodeURIComponent(url)>`, using `&` if the path already
+has a query (`src/v2/client.ts:269-273`).
+
+## D-017: Status handling
+
+- Statuses: `queued`, `in_progress`, `completed`, `failed`, `nsfw`,
+  `canceled` (one "l"; `higgsfield_client/types_.py:71-77`). Terminal:
+  `completed`, `failed`, `nsfw`, `canceled`.
+- Outputs: the SDKs only define `images: [{url}]` and `video: {url}`. Audio and
+  other artifact shapes are undefined in every source we have, so the status
+  parser must accept unknown output keys without crashing, and the audio surface
+  stays blocked until a docs page defines its output shape.
+- Error bodies are FastAPI-style: `detail` is a string or an array of
+  `{loc, msg, type}` (`src/v2/client.ts:155-165`). Out of credits on the
+  generation API is **403** (`src/v2/client.ts:169-170`), which for us is an
+  operator alert (our platform balance), never shown to the user as their
+  problem.
+- Cancel: `POST /requests/{id}/cancel`; 400 once processing has started
+  (`higgsfield_client/http/client.py:298-302`).
+
+## D-018: Upload PUT must send the returned `upload_headers`
+
+The PY SDK sends `upload_headers` (its fixture includes
+`x-amz-tagging: retention=temporary`, so storage is S3-like and uploads may be
+short-lived); JS v1 ignores them. The template sends exactly `upload_headers`
+with `credentials: "omit"` and rejects tickets whose headers include
+`authorization`/`cookie` or a mismatched content type. We keep the template's
+behavior. Because reference uploads may be tagged temporary, the `uploads`
+library tab should copy reference files to R2 too if we want them reusable
+after Higgsfield's retention window. Decide in Phase 3.
