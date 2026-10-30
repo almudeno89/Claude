@@ -1,5 +1,24 @@
 # UI inventory
 
+## Scope override — 2026-10-29
+
+The page/component inventory below is the historical target design, not launch
+authorization. D-005 and D-023–D-025 take precedence. See
+[commercial assessment](commercial-model-review.md) and
+[launch requirements](launch-requirements.md).
+
+For the personal MVP: owner allowlist; private projects/history/assets; actual
+provider-cost display only. Omit public signup, customer Pricing/Upgrade/top-ups,
+checkout/portal, purchasable credit balances, subscription limits, customer
+refund promises, Community/Publish/Recreate and public generation. Mocked
+commercial screens must be disconnected from live payments and job submission.
+
+Before external release, replace `/legal/*` placeholders with reviewed agreements
+and recorded assent; add compliance/moderation and feature-specific consent
+controls. Written resale consent is a separate dependency from useful UI features.
+The original no-branding rule in A8 must be rechecked against any agreement.
+
+
 What we build, page by page, and which template parts each page uses.
 
 - **Part A (this file):** the target pages, global chrome, generator layout,

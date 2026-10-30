@@ -1,5 +1,22 @@
 # Model catalog
 
+## Authorization overlay — 2026-10-29
+
+Technical status below is independent of legal/account eligibility. No model is
+approved for customer resale by this catalog. D-005 and D-023 override historical
+"In the picker?" entries; see [launch requirements](launch-requirements.md).
+
+For each enabled endpoint, record separately: schema/test evidence; workspace
+eligibility; commercial permission reference and scope; upstream/model conditions;
+protected-feature verification/attestations and real-person consent requirements.
+Missing evidence blocks the relevant use. A portrait model name does not establish
+whether a particular request involves a protected real-person likeness.
+
+Soul ID remains future scope; voice, avatar, lip-sync and identity features stay
+off pending the applicable checks. Technical visibility does not authorize jobs.
+No live endpoint tests or account-verification checks were performed in this review.
+
+
 Phase 0 inventory of every model the Higgsfield API may expose, and how sure we
 are of each one. Built **without** the live docs or the console (both blocked;
 `docs/decisions.md` D-001), so nothing here is **Live** yet.

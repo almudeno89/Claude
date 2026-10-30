@@ -4,7 +4,7 @@ Each entry: the decision, why, and the source. Entries marked **OPEN** need an
 answer from the product owner. Entries marked **DISAGREEMENT** record where the
 build brief, the Higgsfield template and other sources disagree (§0 rule 3).
 
-Reference snapshot used for every entry below (cloned into `_reference/`,
+Reference snapshot used for the original Phase 0 entries (cloned into `_reference/`,
 gitignored):
 
 | Repo | Commit | Date |
@@ -16,6 +16,14 @@ gitignored):
 | `higgsfield-ai/skills` | `f83af0b` | 2026-09-26 |
 
 ---
+
+## Review update — 2026-10-29
+
+The commercial review in D-005 and D-023–D-025 overrides conflicting Phase 0
+business/UI assumptions. See [commercial model review](commercial-model-review.md),
+[launch requirements](launch-requirements.md) and the
+[unsent authorization request](higgsfield-authorization-request.md).
+The current default branch is documentation only; these decisions do not implement gates.
 
 ## D-001: Phase 0 ran without the live docs or the live site (BLOCKER)
 
@@ -40,6 +48,11 @@ To unblock: allow those hosts in the environment's network settings (or pick a
 broader access level). Later phases also need `api.resend.com`,
 `api.stripe.com`, `<account>.r2.cloudflarestorage.com`, the Higgsfield upload
 and CDN hosts, and `ui.shadcn.com` (scaffold). See D-012 for MongoDB.
+
+**2026-10-29 update:** the official API terms are now readable and were verified
+for the commercial review. This partially resolves the historical evidence gap;
+live model schemas, console pricing, screenshots and API tests remain unverified.
+The old network observations describe the October 14 environment.
 
 ## D-002: API base URL is `https://api.higgsfield.ai` (DISAGREEMENT, resolved)
 
@@ -66,12 +79,33 @@ comments, re-check for a LICENSE before launch, and get written confirmation
 from Higgsfield if none appears. The SDK, CLI and skills repos carry their own
 licenses (see `docs/model-catalog.md` sources).
 
-## D-005: Higgsfield API terms for resale (OPEN)
+## D-005: Credit-based generation resale (BLOCKED pending written authorization)
 
-The business resells Higgsfield generations for credits at a markup. Before
-launch, confirm the Higgsfield API terms allow reselling generations to end
-users, and what attribution or content-policy pass-through they require. This
-was not checkable (D-001).
+Updated 2026-10-29. The original proposal sells app credits at a markup to fund
+customer image/video generation. The verified restrictions and feature assessment
+are in [commercial-model-review.md](commercial-model-review.md).
+
+The official API terms (displayed version September 2, 2026) make the proposed
+resale model an authorization dependency under section 4.2. Material functionality
+under 4.1 is a separate requirement; project/preset/history features do not
+automatically authorize resale. End-user agreements and protected-feature
+eligibility are independent dependencies.
+
+No written authorization was found in the reviewed tracked documentation.
+This does not establish that no private permission exists. The product owner
+must produce scoped evidence or obtain consent using the prepared request.
+A submitted request or generic commercial-output permission cannot close D-005.
+
+**Decision:** use the owner-only personal MVP as the interim implementation
+scope. Do not enable customer billing, credit purchases, public generation or
+subscription activation for the proposed hub until the relevant launch gates
+are met. Disconnected prototypes and test-mode ledger research may continue.
+Do not treat this documentation commit as implementing runtime protections.
+
+**Exit criteria:** record scoped permission and satisfy the C/B requirements
+in [launch-requirements.md](launch-requirements.md), or explicitly replace the
+business model and re-review its rights before changing this decision.
+Private agreements stay private; commit only a redacted reference and scope.
 
 ## D-006: Template model parameters are often generic, not per-model
 
@@ -239,6 +273,10 @@ entry's parameters against its docs page, because many use generic defaults
 (D-006) and some are invalid (e.g. Hailuo's default duration 5; the CLI allows
 only 6 or 10).
 
+**2026-10-29 override:** technical catalog visibility is not account eligibility
+or commercial permission. D-023 and the launch requirements take precedence over
+the original picker plan, including for protected features.
+
 ## D-020: We add a site header, against the template's "no app header" rule (DISAGREEMENT, resolved)
 
 The template says "Dark theme only. No app header" (`AGENTS.md`). The brief
@@ -264,3 +302,46 @@ spacing waits on the live-site capture (D-001).
 The template loads Space Grotesk / Inter / IBM Plex Mono. The brief describes
 "bold condensed uppercase display headings". Space Grotesk isn't condensed.
 Keep the template fonts until screenshots show what the site uses, then decide.
+
+## D-023: Default to personal scope; separate technical readiness from rights
+
+Private owner-only generation, private projects and an asset library are the
+interim scope, subject to API account/content eligibility. Keep public signup,
+community publishing, paid credits, Pricing/Upgrade/checkout and customer
+generation out of that mode. Provider spend is an owner budget, not a wallet.
+
+The model catalog's Live/Path verified labels describe technical evidence only.
+Add separate review state for account eligibility, commercial authorization,
+partner/model conditions and protected-feature consent/verification before a
+model can serve customers. A successful generation cannot satisfy those checks.
+
+Source: 2026-10-29 commercial model assessment; official API terms linked there.
+See P/C/B requirements for implementation and verification.
+
+## D-024: Legal placeholders and protected-feature access are release blockers
+
+The UI inventory's legal placeholders must become reviewed agreements and
+versioned recorded assent before external users are admitted. Plan enforcement,
+age/compliance controls and suspension handling as launch work, not post-launch
+polish. Maintain feature-specific consent/verification records for real-person
+likeness and identity functionality; keep unresolved features disabled.
+
+D-014's server-only platform key remains the security direction, not evidence
+of resale permission. Template availability and SDK licenses do not close D-004
+or D-005. Customer-owned deployments, BYOK and finished creative services need
+scope review rather than an assumed exemption.
+
+## D-025: Evidence-based activation and alternatives
+
+Follow [launch-requirements.md](launch-requirements.md) for fail-closed server
+gates, signed-off evidence, revocation behavior and re-review triggers.
+These are future implementation requirements; no billing has been enabled here.
+
+Preferred commercial path: seek explicit consent for the original credit hub.
+If unavailable, evaluate a generation-external workflow product or separately
+licensed provider. Preserve a provider adapter boundary and keep customer
+ledger/payment design independent of provider accounting. Do not undertake
+irreversible commercial commitments while permission remains unestablished.
+
+Source: [authorization request](higgsfield-authorization-request.md), prepared
+but not sent; [alternatives assessment](commercial-model-review.md).
